@@ -213,11 +213,30 @@ E-Sys.bat -generatencd <FA または FA リストのファイル> -trace <出力
 - 出力先に同名のファイルがあると、警告なしで上書きする。ジョブごとに出力先を分ける。
 - 戻り値は 0(全部成功)と 1(一部失敗)。
 - ヘルプには「NCD と FP のトレースを出力する」とだけある。batch で FWL も出るかは要実機確認。出なければ GUI の Coding-Verification の設定(FWL トレース)を使うか、別の手段を考える。
-- 計算には CAF(PSdZData の CAFD)が要る。本機は PSdZData が未展開なので、まず Lite を展開して `Esys.properties` から参照させる必要がある。
+- 計算には CAF(PSdZData の CAFD)が要る。PSdZ は `<Path.Home>\psdzdata` を PSdZData として読む(E-Sys のログで確認)。PSdZData を置いたフォルダを `Path.Home` にした設定ファイルのコピーを、batch の `-prop` で渡せば、元の `Esys.properties` を書き換えずに済む。
+- Lite 版にも CAFD と mapping は入っている(4.54.20 Lite で CAFD 8,675 本)。I-Step が新しい車では、Lite 4.54 にない新しい版の CAFD が要る可能性がある。
 - `-readncd` の出力ファイル名は、ヘルプでは `<VIN 下 7 桁>_<CAF>_<基本バリアント>_<ddmmyyyyhhmm>.xml`。中身は FWL 形式とある。§4 のコードからの読み取り(`.fwl`、`yyyyMMddHHmm`)と食い違うので、実機で確かめる。
 - FA リストの XML スキーマはヘルプに同梱されていない。形式は、F31 から読んだ実物の FA で確かめる。
 
 この経路なら、車両への書き込みも署名も通らない。esys-mcp の主な用途(FA を変えて NCD を計算し、FWL を比べる)はここに載せる。
+
+### 本機での試験結果(2026-10-13)
+
+F31 の FA で、FEM_BODY(0x40)の CAFD 1 本(`cafd_00000794.caf.015_041_202`)を指定して実行した。車両には接続していない。
+
+```text
+E-Sys.bat -prop <設定ファイル> -generatencd <FA> -trace <出力先> -caf cafd_00000794.caf.015_041_202
+```
+
+- 終了コードは 0、所要時間は 19 秒(ほとんどが起動時間)。
+- 出力先には次の 4 ファイルができた。`<番号>` は FA リスト内の FA の番号、`<FA の説明>` は FA の車種・仕向けなどの記述。
+  - `<番号>_<FA の説明>_cafd_XXXXXXXX_VVV_VVV_VVV.ncd`: 計算した NCD。S レコード形式のテキスト。
+  - `<番号>_<FA の説明>_cafd_XXXXXXXX_VVV_VVV_VVV.fwl`: FWL。
+  - `<番号>_<FA の説明>.fpl`: FA から作った FP(XML、VIN を含む)。
+  - `VReport_<日時>.txt`: 処理の結果報告(FP の解釈、NCD 生成、FWL 生成がそれぞれ ok か)。
+- **本機の E-Sys では、FWL にパラメータ名が入らなかった。** 中身は `CAF_ID:` の行、`.: . [00 ...]` のダミー行、全部 0 の `SIGNATURE: value [...]` の 3 行だけ。ログにはエラーも警告も出ていない。
+- NCD は中身のあるデータが計算されている。FA を変えたときに NCD のどこが変わるかは、本機でも比べられる。パラメータ名を付けるには、FWL を正しく出せる別環境の E-Sys が要る。
+- 原因は調べていない(CAFD の暗号の領域に入るため)。
 
 ## 11. 未調査の項目
 
