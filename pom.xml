@@ -11,6 +11,14 @@
   <name>esys-mcp (仮称)</name>
   <description>Drive BMW E-Sys from Claude via MCP. Read-only until Phase 5.</description>
 
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <modules>
     <module>core</module>
     <module>server</module>
