@@ -1,0 +1,19 @@
+# レシピ書式のサンプル。パラメータ名や値はダミーで、実車で検証したものではない。
+# 実運用のレシピは recipes/ に置き、公開リポジトリには含めない。
+id: example-recipe
+title: "サンプル: 何かの機能を有効化する"
+verified: false            # ツールは verified: true 以外を常に「未検証」と表示する
+applies_to:
+  chassis: [F30, F31]      # FA/SVT から判定する対象シャシー
+  istep_min: F020-13-03-500
+  istep_max: null
+changes:
+  - ecu: FEM_BODY          # SVT 上の ECU 名(または診断アドレス 0x40 のような表記)
+    cafd: cafd_00000000    # 対象 CAFD の ID
+    cafd_versions: [000_000_000]   # 適用を許す CAFD バージョン
+    parameters:
+      - name: SOME_PARAMETER_NAME
+        value: aktiv
+        was: nicht_aktiv   # 任意。現在値が一致しない場合はツールが警告する
+notes: |
+  書き込み前に FA/SVT/NCD を保存し、人間の承認を得てから commit すること。

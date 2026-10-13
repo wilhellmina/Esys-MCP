@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>esysmcp</groupId>
+    <artifactId>esys-mcp-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>esys-agent</artifactId>
+  <name>esys-agent</name>
+  <description>-javaagent loaded into the E-Sys JVM (bundled 32-bit JRE 1.8.0_92). JDK-only dependencies. Phase 5.</description>
+
+  <properties>
+    <!-- Must stay loadable by E-Sys's bundled JRE 8 (class file version 52). -->
+    <maven.compiler.release>8</maven.compiler.release>
+    <!-- E-Sys jars are compile-time references only and are never shipped. Override with -Desys.home=... -->
+    <esys.home>C:/EC-Apps/ESG/E-Sys</esys.home>
+  </properties>
+
+  <dependencies>
+    <!-- compileOnly equivalent: resolved from the local E-Sys install, absent from any repository. -->
+    <dependency>
+      <groupId>com.bmw.esys</groupId>
+      <artifactId>esysCore</artifactId>
+      <version>3.30.1</version>
+      <scope>system</scope>
+      <systemPath>${esys.home}/lib/esysCore.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.bmw.esys</groupId>
+      <artifactId>esysGen</artifactId>
+      <version>3.30.1</version>
+      <scope>system</scope>
+      <systemPath>${esys.home}/lib/esysGen.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.bmw.psdz</groupId>
+      <artifactId>psdz-api</artifactId>
+      <version>5.04.02</version>
+      <scope>system</scope>
+      <systemPath>${esys.home}/lib/PsdZ/psdz-api.jar</systemPath>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>8</release>
+          <compilerArgs>
+            <!-- JDK 21+ warns that release 8 is obsolete; keep the build quiet until we pin a toolchain. -->
+            <arg>-Xlint:-options</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Premain-Class>esysmcp.agent.EsysAgent</Premain-Class>
+              <Can-Redefine-Classes>false</Can-Redefine-Classes>
+              <Can-Retransform-Classes>false</Can-Retransform-Classes>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

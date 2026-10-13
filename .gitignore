@@ -1,0 +1,29 @@
+# Build output
+target/
+*.class
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Never commit E-Sys, PSdZData, tokens, or decompiled vendor code
+/lib/esys/
+/psdzdata/
+*.est
+*.jks
+decomp/
+decompiled/
+
+# Private know-how and per-vehicle work records (contain VINs)
+/recipes/*
+!/recipes/README.md
+/jobs/
+/samples/private/
+
+# Local config
+/config/local.*
